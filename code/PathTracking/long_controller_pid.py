@@ -45,7 +45,11 @@ class PIDLongController(Controller):
             v_ref = target[4]
         
         # TODO 3.2: PID Control for Longitudinal Motion
-        next_a = v_ref - v
+        err = v_ref - v
+        self.acc_ep += err * self.dt
+        dedt = (err - self.last_ep) / self.dt
+        next_a = self.kp * err + self.ki * self.acc_ep + self.kd * dedt
+        self.last_ep = err
         # [end] TODO 3.2
 
         return next_a, target
