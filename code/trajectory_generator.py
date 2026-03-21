@@ -63,7 +63,14 @@ def generate_speed_profile(path_x, path_y, max_v=20.0, max_lat_acc=2.0, max_long
     # [end] TODO 3.1.b
 
     # TODO 3.1.c Longitudinal Smoothing
-    pass
+    # Forward pass
+    v_ref[0] = 5
+    for i in range(1, len(v_ref)):
+        v_ref[i] = min(v_ref[i], v_ref[i-1] + 2 * max_long_acc * ds[i-1])
+    # Backward pass
+    v_ref[-1] = 0
+    for i in range(len(v_ref)-2, -1, -1):
+        v_ref[i] = min(v_ref[i], v_ref[i+1] + 2 * max_long_dec * ds[i])
     # [end] TODO 3.1.c
 
     return v_ref, curvature
