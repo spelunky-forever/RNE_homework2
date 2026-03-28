@@ -7,9 +7,9 @@ from PathTracking.controller import Controller
 class ControllerPIDBicycle(Controller):
     def __init__(self, model, 
                  # TODO 4.1.3: Tune PID Gains
-                 kp=1.2, 
-                 ki=0.005, 
-                 kd=0.02):
+                 kp=16, 
+                 ki=0.01, 
+                 kd=9.5):
         self.path = None
         self.kp = kp
         self.ki = ki
@@ -44,11 +44,12 @@ class ControllerPIDBicycle(Controller):
         
         # TODO 4.1.3: PID Control for Bicycle Kinematic Model
         target = self.path[min_idx]
-        theta_target = np.rad2deg(np.arctan2(target[1] - y, target[0] - x))
-        theta_err = theta_target - yaw
+        yaw_ref = target[2]
+        theta_err = yaw_ref - yaw
+        theta_err = (theta_err + 180) % 360 - 180
         err = min_dist * np.sin(np.deg2rad(theta_err))
         self.acc_ep += err * self.dt
-        next_delta = self.kp * err + self.ki * self.acc_ep + self.kd * (err - self.last_ep) / self.dt
+        next_delta = self.kp * err + self.ki * self.acc_ep + self.kd * info["v"] * np.sin(np.deg2rad(theta_err))
         self.last_ep = err
         # [end] TODO 4.1.3
         return next_delta

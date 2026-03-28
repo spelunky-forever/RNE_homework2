@@ -7,7 +7,7 @@ from PathTracking.controller import Controller
 class ControllerPurePursuitBicycle(Controller):
     def __init__(self, model, 
                  # TODO 4.3.1: Tune Pure Pursuit Gain
-                 kp=1, Lfc=0):
+                 kp=0.1, Lfc=5):
         self.path = None
         self.kp = kp
         self.Lfc = Lfc
@@ -39,6 +39,19 @@ class ControllerPurePursuitBicycle(Controller):
         Ld = self.kp*v + self.Lfc
         
         # TODO 4.3.1: Pure Pursuit Control for Bicycle Kinematic Model
-        next_delta = 0
+        L = 30.0
+        Ld = self.kp * info["v"] + self.Lfc
+        target_idx = min_idx
+        for i in range(min_idx, len(self.path)):
+            dist = np.hypot(self.path[i][0] - x, self.path[i][1] - y)
+            if dist >= Ld:
+                target_idx = i
+                break
+        target = self.path[target_idx]
+        theta_target = np.rad2deg(np.arctan2(target[1] - y, target[0] - x))
+        alpha = theta_target - yaw
+        alpha = (alpha + 180) % 360 - 180
+        delta_rad = np.arctan( (2 * L * np.sin(np.deg2rad(alpha))) / Ld )
+        next_delta = np.rad2deg(delta_rad)
         # [end] TODO 4.3.1
         return next_delta
