@@ -5,7 +5,7 @@ import PathTracking.utils as utils
 from PathTracking.controller import Controller
 
 class PIDLongController(Controller):
-    def __init__(self, model, a_range, kp=1.5, ki=5, kd=0):
+    def __init__(self, model, a_range, kp=7.0, ki=0.1, kd=0.7):
         self.path = None
         self.kp = kp
         self.ki = ki
@@ -46,7 +46,11 @@ class PIDLongController(Controller):
         
         # TODO 3.2: PID Control for Longitudinal Motion
         err = v_ref - v
-        self.acc_ep += err * self.dt
+        if abs(err) < 2.0:
+            self.acc_ep += err * self.dt
+        else:
+            self.acc_ep = 0.0
+            self.acc_ep += err * self.dt
         dedt = (err - self.last_ep) / self.dt
         next_a = self.kp * err + self.ki * self.acc_ep + self.kd * dedt
         self.last_ep = err
