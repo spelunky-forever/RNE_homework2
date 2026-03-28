@@ -19,7 +19,8 @@ class KinematicModelBicycle(KinematicModel):
         v = state.v + cstate.a * self.dt
         x = state.x + v * np.cos(np.deg2rad(state.yaw)) * self.dt
         y = state.y + v * np.sin(np.deg2rad(state.yaw)) * self.dt
-        w = v * np.tan(np.deg2rad(cstate.delta)) / self.l
+        w_rad = v * np.tan(np.deg2rad(cstate.delta)) / self.l
+        w = np.rad2deg(w_rad)
         yaw = (state.yaw + w * self.dt) % 360
         # [end] TODO 2.3.1
         state_next = State(x, y, yaw, v, w)

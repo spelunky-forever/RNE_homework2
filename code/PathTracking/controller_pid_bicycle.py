@@ -7,9 +7,9 @@ from PathTracking.controller import Controller
 class ControllerPIDBicycle(Controller):
     def __init__(self, model, 
                  # TODO 4.1.3: Tune PID Gains
-                 kp=0.2, 
-                 ki=0.0, 
-                 kd=0.5):
+                 kp=1.2, 
+                 ki=0.005, 
+                 kd=0.02):
         self.path = None
         self.kp = kp
         self.ki = ki
