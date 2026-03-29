@@ -150,7 +150,6 @@ class ControllerLQRBicycle(Controller):
             B[1, 0] = 0.0
             B[2, 0] = self.dt
             
-            # 4. 求解 DARE 方程式
             P = self._solve_DARE(A, B, self.Q, self.R)
             K = np.linalg.inv(self.R + B.T @ P @ B) @ (B.T @ P @ A)
          
