@@ -162,7 +162,7 @@ def setup_simulator_and_controller(args):
             },
             "bicycle": {
                 "1000mStraight": (0.01, 0.0, 0.05),
-                "400mRunningTrack": (16.0, 0.01, 9.5),
+                "400mRunningTrack": (3.0, 0.01, 2.0),
                 "Silverstone": (20.0, 0.05, 12.0),
                 "Suzuka": (22.0, 0.05, 15.0),
                 "Monza": (18.0, 0.05, 12.0),

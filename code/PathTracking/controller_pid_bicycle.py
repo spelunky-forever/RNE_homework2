@@ -44,16 +44,19 @@ class ControllerPIDBicycle(Controller):
         
         # TODO 4.1.3: PID Control for Bicycle Kinematic Model
         target = self.path[min_idx]
-   
-        theta_target = np.rad2deg(np.arctan2(target[1] - y, target[0]-x))
-        theta_err = theta_target - yaw
-
-        theta_err = (theta_err + 180) % 360 - 180 
+        theta_target = np.rad2deg(np.arctan2(target[1] - y, target[0] - x))
+        theta_err_pos = theta_target - yaw
+        theta_err_pos = (theta_err_pos + 180) % 360 - 180
+        err = min_dist * np.sin(np.deg2rad(theta_err_pos))
         
-        err = min_dist * np.sin(np.deg2rad(theta_err))
         self.acc_ep += err * self.dt
-        d_error = (err - self.last_ep) / self.dt
-        next_delta = self.kp * err + self.ki * self.acc_ep + self.kd * d_error
+        
+        yaw_ref = target[2]
+        heading_err = yaw_ref - yaw
+        heading_err = (heading_err + 180) % 360 - 180
+        
+        next_delta = self.kp * err + self.ki * self.acc_ep + self.kd * info["v"] * np.sin(np.deg2rad(heading_err))
+        
         self.last_ep = err
         # [end] TODO 4.1.3
         return next_delta
