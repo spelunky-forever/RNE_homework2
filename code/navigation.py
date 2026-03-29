@@ -144,6 +144,34 @@ def parse_arguments():
 
 def setup_simulator_and_controller(args):
     try:
+        # newfeature: 根據不同的 simulator 與 track 讀取對應的 PID 參數
+        pid_gains = {
+            "basic": {
+                "1000mStraight": (0.4, 0.0, 0.5),
+                "400mRunningTrack": (0.6, 0.0, 0.9),
+                "Silverstone": (1.0, 0.01, 1.5),
+                "Suzuka": (1.2, 0.01, 1.8),
+                "Monza": (1.0, 0.01, 1.5),
+            },
+            "diff_drive": {
+                "1000mStraight": (0.4, 0.0, 0.5),
+                "400mRunningTrack": (0.7, 0.0, 1.0),
+                "Silverstone": (1.1, 0.01, 1.6),
+                "Suzuka": (1.3, 0.01, 2.0),
+                "Monza": (1.1, 0.01, 1.6),
+            },
+            "bicycle": {
+                "1000mStraight": (0.01, 0.0, 0.05),
+                "400mRunningTrack": (16.0, 0.01, 9.5),
+                "Silverstone": (20.0, 0.05, 12.0),
+                "Suzuka": (22.0, 0.05, 15.0),
+                "Monza": (18.0, 0.05, 12.0),
+            }
+        }
+        # 取得對應的 PID 參數，若字典中找不到則給予預設值 (1.0, 0.0, 1.0)
+        track_kp, track_ki, track_kd = pid_gains.get(args.simulator, {}).get(args.track, (1.0, 0.0, 1.0))
+        # end newfeature
+
         if args.simulator == "basic":
             from Simulation.simulator_basic import SimulatorBasic
             simulator = SimulatorBasic()
@@ -151,7 +179,9 @@ def setup_simulator_and_controller(args):
             l_controller = VanillaLongController()
             if args.controller == "pid":
                 from PathTracking.controller_pid_basic import ControllerPIDBasic as Controller
-                controller = Controller(model=simulator.model)
+                # newfeature: 將讀取到的 PID 參數傳入控制器
+                controller = Controller(model=simulator.model, kp=track_kp, ki=track_ki, kd=track_kd)
+                # end newfeature
             elif args.controller == "pure_pursuit":
                 from PathTracking.controller_pure_pursuit_basic import ControllerPurePursuitBasic as Controller
                 controller = Controller(model=simulator.model)
@@ -160,6 +190,7 @@ def setup_simulator_and_controller(args):
                 controller = Controller(model=simulator.model)
             else:
                 raise NameError("Unknown controller!!")
+                
         elif args.simulator == "diff_drive":
             from Simulation.simulator_differential_drive import SimulatorDifferentialDrive
             simulator = SimulatorDifferentialDrive()
@@ -167,7 +198,9 @@ def setup_simulator_and_controller(args):
             l_controller = VanillaLongController()
             if args.controller == "pid":
                 from PathTracking.controller_pid_basic import ControllerPIDBasic as Controller
-                controller = Controller(model=simulator.model)
+                # newfeature: 將讀取到的 PID 參數傳入控制器
+                controller = Controller(model=simulator.model, kp=track_kp, ki=track_ki, kd=track_kd)
+                # end newfeature
             elif args.controller == "pure_pursuit":
                 from PathTracking.controller_pure_pursuit_basic import ControllerPurePursuitBasic as Controller
                 controller = Controller(model=simulator.model)
@@ -176,6 +209,7 @@ def setup_simulator_and_controller(args):
                 controller = Controller(model=simulator.model)
             else:
                 raise NameError("Unknown controller!!")
+                
         elif args.simulator == "bicycle":
             from Simulation.simulator_bicycle import SimulatorBicycle 
             simulator = SimulatorBicycle()
@@ -183,7 +217,9 @@ def setup_simulator_and_controller(args):
             l_controller = PIDLongController(model=simulator.model, a_range=simulator.a_range)
             if args.controller == "pid":
                 from PathTracking.controller_pid_bicycle import ControllerPIDBicycle as Controller
-                controller = Controller(model=simulator.model)
+                # newfeature: 將讀取到的 PID 參數傳入控制器
+                controller = Controller(model=simulator.model, kp=track_kp, ki=track_ki, kd=track_kd)
+                # end newfeature
             elif args.controller == "pure_pursuit":
                 from PathTracking.controller_pure_pursuit_bicycle import ControllerPurePursuitBicycle as Controller
                 controller = Controller(model=simulator.model)
